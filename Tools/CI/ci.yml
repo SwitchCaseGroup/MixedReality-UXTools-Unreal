@@ -9,7 +9,7 @@ stages:
 - stage: Windows
   dependsOn: []
   pool:
-    name: $(AgentPool)
+    vmImage: 'windows-2019'
   # uncomment after switching to UE4.25
   variables:
     - template: settings/ue425undefs.yml
