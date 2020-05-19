@@ -53,30 +53,3 @@ steps:
     targetType: 'filePath'
     filePath: $(UXTSourceDir)\Tools\scripts\ConvertTestOutputToXML.ps1
     arguments: -Path "${{ parameters.TestOutputDir }}\EditorTests\index.json" -Output ${{ parameters.TestOutputDir }}\EditorTests\results.xml
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Test result files to pipeline artifacts'
-  inputs:
-    ArtifactName: 'Test Results'
-    PathtoPublish: '${{ parameters.TestOutputDir }}'
-
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit, cTest
-    testResultsFiles: '${{ parameters.TestOutputDir }}\EditorTests\results.xml'
-    failTaskOnFailedTests: true
-
-- task: DownloadSecureFile@1
-  name: signingCertificate
-  displayName: 'Download signing certificate'
-  inputs:
-    secureFile: 'SigningCertificate.pfx'
-
-- script: |
-    IF NOT EXIST "$(UXTSourceDir)\UXToolsGame\Build" mkdir "$(UXTSourceDir)\UXToolsGame\Build"
-    IF NOT EXIST "$(UXTSourceDir)\UXToolsGame\Build\HoloLens" mkdir "$(UXTSourceDir)\UXToolsGame\Build\HoloLens"
-    copy "$(signingCertificate.secureFilePath)" "$(UXTSourceDir)\UXToolsGame\Build\HoloLens\SigningCertificate.pfx"
-  displayName: 'Copy self-signing certificate (HoloLens)'
-
-- script: '$(UAT) BuildCookRun -project=$(UXTSourceDir)\UXToolsGame\UXToolsGame.uproject -clean -cook -allmaps -build -stage -platform=HoloLens -clientconfig=Development -serverconfig=Development'
-  displayName: 'Build HoloLens ARM64 Development'
